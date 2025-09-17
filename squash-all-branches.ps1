@@ -39,24 +39,35 @@ foreach ($br in $BRANCHES) {
     Write-Host ""
     Write-Info "Processing branch: $br"
 
-    # git checkout $br 2>$null
-    # if ($LASTEXITCODE -ne 0) {
-    #     Write-Info "Branch $br does not exist, skipped."
-    #     continue
-    # }
+    # ----------  静默判断分支是否存在  ----------
+    # 1. 本地是否已存在
+    $localExists = git rev-parse --verify --quiet "refs/heads/$br"
+    # 2. 远端是否 exists
+    $remoteExists = git rev-parse --verify --quiet "refs/remotes/origin/$br"
 
-    # 彻底静默切换分支
-    $current = git branch --show-current
-    if ($current -eq $br) {
-        Write-Info "Already on $br, no need to switch."
-    } else {
-        git checkout $br 2>&1 | Out-Null
+    if (-not $localExists -and -not $remoteExists) {
+        # 两边都没有 → 忽略
+        Write-Info "Branch $br does not exist locally or on origin, skipped."
+        continue
+    }
+
+    # 3. 如果本地没有但远端有，就新建跟踪分支
+    if (-not $localExists) {
+        git checkout -b $br "origin/$br" 2>$null
         if ($LASTEXITCODE -ne 0) {
-            Write-Info "Branch $br does not exist, skipped."
+            Write-Info "Could not create tracking branch for $br, skipped."
             continue
         }
     }
-
+    else {
+        # 本地已有，直接切换（静默）
+        git checkout $br 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Info "Could not checkout $br, skipped."
+            continue
+        }
+    }
+    # ----------  分支切换完成，继续你的 squash 逻辑  ----------
 
     git checkout --orphan "new-$br"
     git rm -rf . | Out-Null
