@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Excel数据工具</title>
+    <script
+      type="text/javascript"
+      src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
+    ></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        background-color: #f8f9fa;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #1e6f5c;
+        margin-top: 0;
+        font-size: 24px;
+        text-align: center;
+      }
+      .instructions {
+        background-color: #e8f4f0;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .step {
+        margin-bottom: 8px;
+      }
+      .step-number {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background: #1e6f5c;
+        color: white;
+        text-align: center;
+        line-height: 24px;
+        border-radius: 50%;
+        margin-right: 8px;
+        font-size: 14px;
+      }
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+      }
+      button {
+        background-color: #1e6f5c;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #165a48;
+      }
+      button:disabled {
+        background-color: #9e9e9e;
+        cursor: not-allowed;
+      }
+      #clearButton {
+        background-color: #d9534f;
+      }
+      #clearButton:hover {
+        background-color: #c9302c;
+      }
+      .status {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+      }
+      .success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+      }
+      .error {
+        background-color: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+      }
+      .loading {
+        text-align: center;
+        margin: 20px 0;
+        display: none;
+      }
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1e6f5c;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 250px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -125px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Excel数据工具</h1>
+
+      <div class="instructions">
+        <div class="step">
+          <span class="step-number">1</span>在Excel中选择两列数据（如A列和B列）
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>点击下面的按钮进行比较
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>工具将创建新工作表显示差异结果
+        </div>
+      </div>
+
+      <div class="button-container">
+        <div class="tooltip">
+          <button id="compareButton">比较两列数据</button>
+          <span class="tooltiptext">
+            操作步骤:<br />
+            1. 在Excel中选择两列数据（如A列和B列）<br />
+            2. 点击此按钮进行比较<br />
+            3. 工具将创建新工作表显示差异结果
+          </span>
+        </div>
+
+        <div class="tooltip">
+          <button id="clearButton">清空当前工作表数据</button>
+          <span class="tooltiptext">
+            操作步骤:<br />
+            1. 确保您在当前要清空的工作表中<br />
+            2. 点击此按钮清空所有数据<br />
+            3. 注意: 此操作不可撤销，请谨慎使用
+          </span>
+        </div>
+      </div>
+
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>处理中，请稍候...</p>
+      </div>
+
+      <div id="statusMessage" class="status"></div>
+    </div>
+    <!-- <script src="addin.js"></script> -->
+    <script>
+      Office.onReady((info) => {
+        if (info.host === Office.HostType.Excel) {
+          document.getElementById("compareButton").onclick = compareColumns;
+          document.getElementById("clearButton").onclick = clearWorksheet;
+        }
+      });
+
+      async function compareColumns(event) {
+        const button = document.getElementById("compareButton");
+        const statusMessage = document.getElementById("statusMessage");
+        const loading = document.querySelector(".loading");
+
+        // 重置状态信息
+        statusMessage.style.display = "none";
+        statusMessage.className = "status";
+        button.disabled = true;
+        loading.style.display = "block";
+
+        try {
+          await Excel.run(async (context) => {
+            // 获取当前选定的范围
+            const range = context.workbook.getSelectedRange();
+            range.load("columnCount, columnIndex, address, values");
+
+            await context.sync();
+
+            // 检查是否选中了两列
+            if (range.columnCount !== 2) {
+              throw new Error(
+                "请选择恰好两列数据进行比较。您当前选择了 " +
+                  range.columnCount +
+                  " 列。"
+              );
+            }
+
+            // 获取两列数据
+            const columnA = [];
+            const columnB = [];
+
+            for (let i = 0; i < range.values.length; i++) {
+              if (
+                range.values[i][0] !== undefined &&
+                range.values[i][0] !== null &&
+                range.values[i][0] !== ""
+              ) {
+                columnA.push(range.values[i][0]);
+              }
+              if (
+                range.values[i][1] !== undefined &&
+                range.values[i][1] !== null &&
+                range.values[i][1] !== ""
+              ) {
+                columnB.push(range.values[i][1]);
+              }
+            }
+
+            // 找出差异数据
+            const inANotInB = columnA.filter((item) => !columnB.includes(item));
+            const inBNotInA = columnB.filter((item) => !columnA.includes(item));
+
+            // 获取当前工作表名称用于引用
+            const originalSheet =
+              context.workbook.worksheets.getActiveWorksheet();
+            originalSheet.load("name");
+            await context.sync();
+
+            // 创建新工作表
+            const newSheetName =
+              "比较结果_" + new Date().getTime().toString().slice(-4);
+            const newSheet = context.workbook.worksheets.add(newSheetName);
+
+            // 设置标题
+            newSheet.getRange("A1").values = [["A列有但B列没有的数据"]];
+            newSheet.getRange("B1").values = [["B列有但A列没有的数据"]];
+
+            // 设置标题样式
+            newSheet.getRange("A1:B1").format.fill.color = "#e8f4f0";
+            newSheet.getRange("A1:B1").format.font.bold = true;
+
+            // 填充数据
+            const maxLength = Math.max(inANotInB.length, inBNotInA.length);
+            for (let i = 0; i < maxLength; i++) {
+              if (i < inANotInB.length) {
+                newSheet.getRange(`A${i + 2}`).values = [[inANotInB[i]]];
+              }
+              if (i < inBNotInA.length) {
+                newSheet.getRange(`B${i + 2}`).values = [[inBNotInA[i]]];
+              }
+            }
+
+            // 自动调整列宽
+            newSheet.getUsedRange().format.autofitColumns();
+
+            // 添加指向原始数据的引用
+            const originalRangeAddress = range.address;
+            const originalSheetName = originalSheet.name;
+
+            newSheet.getRange("D1").values = [
+              [`数据来源: ${originalSheetName}!${originalRangeAddress}`],
+            ];
+            newSheet.getRange("D1").format.font.size = 10;
+            newSheet.getRange("D1").format.font.color = "#666666";
+
+            // 激活新工作表
+            newSheet.activate();
+
+            await context.sync();
+
+            // 显示成功消息
+            showStatus(
+              `成功创建比较结果！找到 ${inANotInB.length} 个A列独有项和 ${inBNotInA.length} 个B列独有项。`,
+              "success"
+            );
+          });
+        } catch (error) {
+          console.error(error);
+          showStatus("错误: " + error.message, "error");
+        } finally {
+          button.disabled = false;
+          loading.style.display = "none";
+          event || event.completed();
+        }
+      }
+
+      async function clearWorksheet(event) {
+        const button = document.getElementById("clearButton");
+        const statusMessage = document.getElementById("statusMessage");
+        const loading = document.querySelector(".loading");
+
+        // 重置状态信息
+        statusMessage.style.display = "none";
+        statusMessage.className = "status";
+        button.disabled = true;
+        loading.style.display = "block";
+
+        try {
+          await Excel.run(async (context) => {
+            // 获取当前活动工作表
+            const sheet = context.workbook.worksheets.getActiveWorksheet();
+
+            // 清空所有单元格内容[1,2](@ref)
+            sheet.getUsedRange().clear();
+
+            await context.sync();
+
+            // 显示成功消息
+            showStatus("工作表已成功清空！", "success");
+          });
+        } catch (error) {
+          console.error(error);
+          showStatus("错误: " + error.message, "error");
+        } finally {
+          button.disabled = false;
+          loading.style.display = "none";
+          event || event.completed();
+        }
+      }
+
+      function showStatus(message, type) {
+        const statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = message;
+        statusMessage.className = "status " + type;
+        statusMessage.style.display = "block";
+      }
+
+      Office.actions.associate("groupCompareColumns", compareColumns);
+      Office.actions.associate("groupClearWorksheet", clearWorksheet);
+    </script>
+  </body>
+</html>

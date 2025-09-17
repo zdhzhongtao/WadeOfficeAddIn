@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
+  <Id>775091b3-e24a-4cf4-a65b-26976fda4f3d</Id>
+  <Version>1.0.0.1</Version>
+  <ProviderName>Wade</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Wade Office Add-in"/>
+  <Description DefaultValue="Advanced data and HTML tools for Excel"/>
+  <IconUrl DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://learn.microsoft.com/office/dev/add-ins/overview/office-add-in-code-samples"/>
+  <AppDomains>
+    <AppDomain>https://OfficeDev.github.io</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Workbook"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://zdhzhongtao.github.io/WadeOfficeAddIn/"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Workbook">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.Description"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          
+          <!-- 共享运行时支持 -->
+          <FunctionFile resid="Commands.Url"/>
+          
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <!-- 创建自定义选项卡 -->
+            <CustomTab id="WadeAddIn">
+              <!-- Data Tools 分区 -->
+              <Group id="DataToolsGroup">
+                <Label resid="DataToolsGroup.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                
+                <!-- 列比较按钮 -->
+                <Control xsi:type="Button" id="CompareColumnsButton">
+                  <Label resid="CompareColumnsButton.Label"/>
+                  <Supertip>
+                    <Title resid="CompareBtn.SupertipTitle"/>
+                    <Description resid="CompareBtn.SupertipText"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="DataIcon.16x16"/>
+                    <bt:Image size="32" resid="DataIcon.32x32"/>
+                    <bt:Image size="80" resid="DataIcon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>groupCompareColumns</FunctionName>
+                  </Action>
+                </Control>
+                
+                <!-- 清除数据按钮 -->
+                <Control xsi:type="Button" id="ClearDataButton">
+                  <Label resid="ClearDataButton.Label"/>
+                  <Supertip>
+                    <Title resid="ClearDataButton.SupertipTitle"/>
+                    <Description resid="ClearDataButton.SupertipText"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="ClearIcon.16x16"/>
+                    <bt:Image size="32" resid="ClearIcon.32x32"/>
+                    <bt:Image size="80" resid="ClearIcon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>groupClearWorksheet</FunctionName>
+                  </Action>
+                </Control>
+              </Group>
+              
+              <!-- HTML Tools 分区 -->
+              <Group id="HTMLToolsGroup">
+                <Label resid="HTMLToolsGroup.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="HTMLIcon.16x16"/>
+                  <bt:Image size="32" resid="HTMLIcon.32x32"/>
+                  <bt:Image size="80" resid="HTMLIcon.80x80"/>
+                </Icon>
+                
+                <!-- HTML 面板按钮 -->
+                <Control xsi:type="Button" id="HTMLPaneButton">
+                  <Label resid="HTMLPaneButton.Label"/>
+                  <Supertip>
+                    <Title resid="HTMLPaneButton.SupertipTitle"/>
+                    <Description resid="HTMLPaneButton.SupertipText"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="HTMLIcon.16x16"/>
+                    <bt:Image size="32" resid="HTMLIcon.32x32"/>
+                    <bt:Image size="80" resid="HTMLIcon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>HTMLPaneId</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+              <Label resid="CustomTab.Label"/>
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <!-- 图标资源 -->
+      <bt:Images>
+        <!-- 共享图标 -->
+        <bt:Image id="Icon.16x16" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-80.png"/>
+        
+        <!-- 数据工具图标 -->
+        <bt:Image id="DataIcon.16x16" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-16.png"/>
+        <bt:Image id="DataIcon.32x32" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-32.png"/>
+        <bt:Image id="DataIcon.80x80" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-80.png"/>
+        
+        <!-- 清除图标 -->
+        <bt:Image id="ClearIcon.16x16" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-16.png"/>
+        <bt:Image id="ClearIcon.32x32" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-32.png"/>
+        <bt:Image id="ClearIcon.80x80" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-80.png"/>
+        
+        <!-- HTML图标 -->
+        <bt:Image id="HTMLIcon.16x16" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-16.png"/>
+        <bt:Image id="HTMLIcon.32x32" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-32.png"/>
+        <bt:Image id="HTMLIcon.80x80" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/hello-world/excel-hello-world/assets/icon-80.png"/>
+      </bt:Images>
+      
+      <!-- URL资源 -->
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="http://go.microsoft.com/fwlink/?LinkId=276812"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://zdhzhongtao.github.io/WadeOfficeAddIn/index.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://zdhzhongtao.github.io/WadeOfficeAddIn/index.html"/>
+      </bt:Urls>
+      
+      <!-- 短文本资源 -->
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with Wade Tools!"/>
+        <bt:String id="CustomTab.Label" DefaultValue="WadeAddIn"/>
+        
+        <!-- Data Tools 组 -->
+        <bt:String id="DataToolsGroup.Label" DefaultValue="Data Tools"/>
+        <bt:String id="CompareColumnsButton.Label" DefaultValue="Compare Columns"/>
+        <bt:String id="CompareBtn.SupertipTitle" DefaultValue="Compare Columns"/>
+        <bt:String id="ClearDataButton.Label" DefaultValue="Clear Data"/>
+        <bt:String id="ClearDataButton.SupertipTitle" DefaultValue="Clear Worksheet"/>
+        
+        <!-- HTML Tools 组 -->
+        <bt:String id="HTMLToolsGroup.Label" DefaultValue="HTML Tools"/>
+        <bt:String id="HTMLPaneButton.Label" DefaultValue="HTMLPane"/>
+        <bt:String id="HTMLPaneButton.SupertipTitle" DefaultValue="Open HTML Tools"/>
+      </bt:ShortStrings>
+      
+      <!-- 长文本资源 -->
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Your Wade tools add-in loaded successfully. Go to the WADEADDIN tab to access data and HTML tools."/>
+        
+        <!-- Data Tools 按钮说明 -->
+        <bt:String id="CompareBtn.SupertipText" DefaultValue="Compare two columns of data directly"/>
+        <bt:String id="ClearDataButton.SupertipText" DefaultValue="Clear all data from the current worksheet"/>
+        
+        <!-- HTML Tools 按钮说明 -->
+        <bt:String id="HTMLPaneButton.SupertipText" DefaultValue="Open the HTML tools pane for advanced operations"/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
