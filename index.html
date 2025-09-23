@@ -59,29 +59,53 @@
         gap: 12px;
         margin-top: 15px;
       }
-      button {
-        background-color: #1e6f5c;
-        color: white;
+      .quiz-button {
+        display: flex;
+        align-items: center;
         border: none;
-        padding: 12px 20px;
-        border-radius: 5px;
+        padding: 15px 20px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 16px;
         width: 100%;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: left;
+        color: white;
+        font-weight: 600;
+        background: linear-gradient(90deg, var(--start-color), var(--end-color));
+        width: fit-content;
+        min-width: 50%;
       }
-      button:hover {
-        background-color: #165a48;
+      .quiz-button:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
       }
-      button:disabled {
-        background-color: #9e9e9e;
+      .quiz-button:disabled {
+        opacity: 0.6;
         cursor: not-allowed;
       }
-      #clearButton {
-        background-color: #d9534f;
+      .button-icon {
+        margin-right: 12px;
+        font-size: 20px;
+        /* filter: brightness(0) invert(1); */
       }
-      #clearButton:hover {
-        background-color: #c9302c;
+      /* 特定按钮颜色 - 使用渐变 */
+      .button-pink {
+        --start-color: #FF6B8B;
+        --end-color: #FFA3B4;
+      }
+      .button-purple {
+        --start-color: #9C56B5;
+        --end-color: #5E72E4;
+      }
+      .button-cyan {
+        --start-color: #4ECDC4;
+        --end-color: #A5E6BA;
+      }
+      .button-orange {
+        --start-color: #FF9F43;
+        --end-color: #FFD26F;
       }
       .status {
         margin-top: 15px;
@@ -168,7 +192,10 @@
 
       <div class="button-container">
         <div class="tooltip">
-          <button id="compareButton">比较两列数据</button>
+          <button id="compareButton" class="quiz-button button-pink">
+            <span class="button-icon">🔍</span>
+            比较两列数据
+          </button>
           <span class="tooltiptext">
             操作步骤:<br />
             1. 在Excel中选择两列数据（如A列和B列）<br />
@@ -178,12 +205,36 @@
         </div>
 
         <div class="tooltip">
-          <button id="clearButton">清空当前工作表数据</button>
+          <button id="clearButton" class="quiz-button button-purple">
+            <span class="button-icon">💡</span>
+            清空当前工作表数据
+          </button>
           <span class="tooltiptext">
             操作步骤:<br />
             1. 确保您在当前要清空的工作表中<br />
             2. 点击此按钮清空所有数据<br />
             3. 注意: 此操作不可撤销，请谨慎使用
+          </span>
+        </div>
+
+        <!-- 新增的两个TODO按钮 -->
+        <div class="tooltip">
+          <button class="quiz-button button-cyan" disabled>
+            <span class="button-icon">✏️</span>
+            按某列数据拆分成多个sheet表
+          </button>
+          <span class="tooltiptext">
+            此功能正在开发中，敬请期待...
+          </span>
+        </div>
+
+        <div class="tooltip">
+          <button class="quiz-button button-orange" disabled>
+            <span class="button-icon">🏆</span>
+            自动提取身份中生日和年龄
+          </span>
+          <span class="tooltiptext">
+            此功能正在开发中，敬请期待...
           </span>
         </div>
       </div>
